@@ -1,3 +1,0 @@
-/mnt/c/Users/sarin/Documents/GitHub/option_pricing/build/CMakeFiles/option_pricing.dir
-/mnt/c/Users/sarin/Documents/GitHub/option_pricing/build/CMakeFiles/edit_cache.dir
-/mnt/c/Users/sarin/Documents/GitHub/option_pricing/build/CMakeFiles/rebuild_cache.dir
