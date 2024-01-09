@@ -24,8 +24,10 @@ class binomial_asset_pricing {
    * */
 
 public:
-  int binomial_tree(double S0, double k, double t, int n, double r, double u,
-                    char type);
+  double european_option_binomial(double S0, double k, double t, int n,
+                                  double r, double u, char opttype);
+  double barrier_option_binomial(double S0, double k, double H, double t, int n,
+                                 double r, double u, char opttype);
 };
 
 #endif // BINOMIAL_HEADER_H
