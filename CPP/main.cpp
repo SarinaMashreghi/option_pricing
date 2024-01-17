@@ -1,3 +1,24 @@
 #include "include/binomial_model.h"
 
-int main() { return 0; }
+int main() {
+  double initial_price = 100;
+  double strike = 100;
+  double time_to_maturity = 1;
+  double interest_rate = 0.06;
+  int time_steps = 3;
+  double up_factor = 1.1;
+  char option_type = 'C';
+  double barrier = 125;
+
+  binomial_asset_pricing pricing_model = binomial_asset_pricing();
+
+  double european_opt = pricing_model.european_option_binomial(
+      initial_price, strike, time_to_maturity, time_steps, interest_rate,
+      up_factor, option_type);
+
+  double barrier_opt = pricing_model.barrier_option_binomial(
+      initial_price, strike, barrier, time_to_maturity, time_steps,
+      interest_rate, up_factor, option_type);
+  cout << barrier_opt << endl;
+  0;
+}

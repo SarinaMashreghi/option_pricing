@@ -30,7 +30,7 @@ double binomial_asset_pricing::european_option_binomial(double S0, double k,
 
   for (int i = n; i > 0; i--) {
     for (int j = 0; j < i; j++) {
-      value[i] = (p * value[i] + q * value[i + 1]) / disc;
+      value[j] = (p * value[j] + q * value[j + 1]) / disc;
     }
   }
 
@@ -59,22 +59,22 @@ double binomial_asset_pricing::barrier_option_binomial(double S0, double k,
 
   for (int i = 0; i <= n; i++) {
     if (opttype == 'C')
-      value[i] =
-          (price[i] - k > 0 ? price[i] - k : 0) * (price[i] < H); // call option
+      value[i] = (price[i] - k > 0 ? price[i] - k : 0) *
+                 (price[i] <= H); // call option
     else
       value[i] =
-          (k - price[i] > 0 ? k - price[i] : 0) * (price[i] < H); // put option
+          (k - price[i] > 0 ? k - price[i] : 0) * (price[i] >= H); // put option
   }
 
   // backward recurssion
   for (int i = n; i > 0; i--) {
     for (int j = 0; j < i; j++) {
       if (price[i] < H)
-        value[i] = (p * value[i] + q * value[i + 1]) / disc;
+        value[j] = (p * value[j] + q * value[j + 1]) / disc;
       else
-        value[i] = 0;
+        value[j] = 0;
 
-      price[i] /= u;
+      price[j] /= u;
     }
   }
 
