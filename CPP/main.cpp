@@ -1,6 +1,11 @@
 #include "include/binomial_model.h"
+#include "include/matplotlibcpp.h"
+namespace plt = matplotlibcpp;
 
 int main() {
+
+  plt::plot({1, 2, 3, 4});
+  plt::save("test.png");
   double initial_price = 100;
   double strike = 100;
   double time_to_maturity = 1;
@@ -20,5 +25,5 @@ int main() {
       initial_price, strike, barrier, time_to_maturity, time_steps,
       interest_rate, up_factor, option_type);
   cout << barrier_opt << endl;
-  0;
+  return 0;
 }
