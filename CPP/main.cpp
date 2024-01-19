@@ -1,11 +1,12 @@
 #include "include/binomial_model.h"
-#include "include/matplotlibcpp.h"
-namespace plt = matplotlibcpp;
+#include "include/stochastic.h"
 
 int main() {
 
-  plt::plot({1, 2, 3, 4});
-  plt::save("test.png");
+  stochastic s = stochastic();
+  vector<vector<int>> rw = s.random_walk_symmetric(100, 100);
+  s.make_plot(rw);
+
   double initial_price = 100;
   double strike = 100;
   double time_to_maturity = 1;
