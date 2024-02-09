@@ -24,10 +24,13 @@ class binomial_asset_pricing {
    * */
 
 public:
-  double european_option_binomial(double S0, double k, double t, int n,
-                                  double r, double u, char opttype);
+  vector<double> european_option_binomial(double S0, double k, double t, int n,
+                                          double r, double u, char opttype);
   double barrier_option_binomial(double S0, double k, double H, double t, int n,
                                  double r, double u, char opttype);
+
+  vector<double> CRR(double initial_price, double strike, double interest,
+                     double volatility, double time, int n_steps, char opttype);
 };
 
 #endif // BINOMIAL_HEADER_H

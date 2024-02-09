@@ -1,9 +1,7 @@
 #include "../include/binomial_model.h"
 
-double binomial_asset_pricing::european_option_binomial(double S0, double k,
-                                                        double t, int n,
-                                                        double r, double u,
-                                                        char opttype) {
+vector<double> binomial_asset_pricing::european_option_binomial(
+    double S0, double k, double t, int n, double r, double u, char opttype) {
 
   double dt = t / n;
   double disc = exp(dt * r);
@@ -34,7 +32,7 @@ double binomial_asset_pricing::european_option_binomial(double S0, double k,
     }
   }
 
-  return value[0];
+  return value;
 }
 
 double binomial_asset_pricing::barrier_option_binomial(double S0, double k,
@@ -79,4 +77,16 @@ double binomial_asset_pricing::barrier_option_binomial(double S0, double k,
   }
 
   return value[0];
+}
+
+// setting parameters
+vector<double> binomial_asset_pricing::CRR(double initial_price, double strike,
+                                           double interest, double volatility,
+                                           double time, int n_steps,
+                                           char opttype) {
+  double dt = time / n_steps;
+  double u = exp(volatility * dt);
+
+  return european_option_binomial(initial_price, strike, time, n_steps,
+                                  interest, u, opttype);
 }
