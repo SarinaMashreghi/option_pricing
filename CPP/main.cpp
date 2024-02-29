@@ -1,5 +1,6 @@
 #include "include/binomial_model.h"
 #include "include/stochastic.h"
+#include "include/tools.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -9,9 +10,11 @@ int main() {
   stochastic s = stochastic();
   // vector<vector<double>> rw = s.random_walk_symmetric(100, 100);
   vector<vector<double>> gbm = s.GBM(10, 100, 0.1, 0.3, 1000, 1);
-  string file_name = "ma_plot.png";
+  string file_name = "test.png";
+  tools visualizer = tools();
+  visualizer.make_plot(gbm, file_name);
   // s.plot_ma(gbm[0], 5, file_name);
-  s.plot_mean_var(gbm[0]);
+  // s.make_plot(gbm, file_name);
 
   double initial_price = 100;
   double strike = 100;

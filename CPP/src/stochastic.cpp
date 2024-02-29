@@ -44,46 +44,19 @@ vector<vector<double>> stochastic::GBM(int num_simulations, double initial_val,
   return res;
 }
 
-void stochastic::make_plot(vector<vector<double>> &results, string &file_name) {
-  /*
-  vector<double> x(100);
-  for (int i = 0; i < 100; i++)
-    x[i] = 0.01 * (i + 1);
-  */
-  // plt::plot(x, results);
-
-  for (auto rw : results)
-    plt::plot(rw);
-
-  plt::save(file_name);
-}
-
-void stochastic::make_plot(vector<double> &results, string &file_name) {
-
-  plt::plot(results);
-
-  plt::save(file_name);
-}
-
-void stochastic::plot_ma(vector<double> &values, int period,
-                         string &file_name) {
+double stochastic::european_option_expected(vector<vector<double>> &gbm,
+                                            double strike, char opt_type) {
   double total = 0;
-  vector<double> ma;
-  vector<double> x;
 
-  for (int i = 0; i < values.size(); i++) {
-    if (i < period) {
-      total += values[i];
-    } else {
-      ma.push_back(total / period);
-      x.push_back(i);
-      total += values[i] - values[i - period];
-    }
+  for (auto sim : gbm) {
+    double final_price = sim[sim.size() - 1];
+    if (opt_type == 'C')
+      total += final_price > strike ? final_price - strike : 0;
+    else if (opt_type == 'P')
+      total += final_price < strike ? strike - final_price : 0;
   }
 
-  plt::plot(values);
-  plt::plot(x, ma);
-  plt::save(file_name);
+  return total / gbm.size();
 }
 
 double stochastic::get_var(vector<double> &values, int idx, double mean) {
@@ -97,26 +70,4 @@ double stochastic::get_vol(vector<double> &values, int idx, double mean) {
   double var = get_var(values, idx, mean);
   double std = sqrt(var);
   return std;
-}
-
-void stochastic::plot_mean_var(vector<double> &values) {
-  vector<double> mean;
-  vector<double> var;
-
-  double total = 0;
-  for (int i = 0; i < values.size(); i++) {
-    total += values[i];
-    mean.push_back(total / (i + 1));
-    var.push_back(get_var(values, i, total / (i + 1)));
-  }
-
-  plt::plot(mean);
-  plt::plot(values);
-  plt::save("mean.png");
-
-  plt::plot(var);
-  plt::save("vol.png");
-
-  cout << "mean: " << mean[mean.size() - 1]
-       << " variance: " << var[var.size() - 1] << endl;
 }

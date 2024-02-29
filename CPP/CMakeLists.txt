@@ -12,11 +12,14 @@ add_executable(option_pricing
 	main.cpp
 	src/binomial_model.cpp
 	src/stochastic.cpp
+	src/tools.cpp
+
 
 	# h 
 	include/binomial_model.h
 	include/matplotlibcpp.h
 	include/stochastic.h
+	include/tools.h
 )
 
 include_directories({PYTHON3_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIRS})
