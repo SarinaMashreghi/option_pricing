@@ -9,10 +9,19 @@
 class simulation {
 public:
   // simulation();
-  void european_option_expected();
+  vector<vector<double>> binomial_model_sim(int num_simulations,
+                                            double initial_price,
+                                            double interest_rate, double sigma,
+                                            int time, int time_steps);
 
-  void gbm_vs_binomial(int num_simulations, double initial_price, double drift,
-                       double volatility, int time, int time_steps);
+  void gbm_vs_binomial_sim(int num_simulations, double initial_price,
+                           double drift, double volatility, int time,
+                           int time_steps);
+
+  void option_expected_value(int num_simulation, double initial_price,
+                             double strike_price, double interest_rate,
+                             double volatility, char opt_type, int time,
+                             int time_steps);
 
 private:
   stochastic m_stochastic_gen;

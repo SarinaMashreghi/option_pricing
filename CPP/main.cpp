@@ -24,7 +24,7 @@ int main() {
   double time_to_maturity = 1;
   double interest_rate = 0.06;
   int time_steps = 10;
-  double up_factor = 1.1;
+  double up_factor = 1.03045;
   char option_type = 'C';
   double barrier = 125;
   double vol = 0.3;
@@ -37,7 +37,10 @@ int main() {
 
   cout << "bin model " << opt_price[0] << endl;
 
-  sim.gbm_vs_binomial(5, initial_price, 0.1, vol, time_to_maturity, 1000);
+  // sim.gbm_vs_binomial_sim(10000, initial_price, 0, vol, time_to_maturity,
+  // 1000);
+  sim.option_expected_value(10000, initial_price, strike, interest_rate, vol,
+                            option_type, time_to_maturity, time_steps);
 
   /*
 

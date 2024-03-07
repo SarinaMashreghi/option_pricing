@@ -66,3 +66,19 @@ void tools::plot_mean_var(vector<double> &values) {
   cout << "mean: " << mean[mean.size() - 1]
        << " variance: " << var[var.size() - 1] << endl;
 }
+
+vector<double> tools::expected_value(vector<vector<double>> &simulations) {
+  int n_sims = simulations.size();
+  int steps = simulations[0].size();
+
+  vector<double> expected_vals(steps, 0);
+
+  for (int i = 0; i < steps; i++) {
+    for (int j = 0; j < n_sims; j++) {
+      expected_vals[i] += simulations[j][i];
+    }
+    expected_vals[i] /= n_sims;
+  }
+
+  return expected_vals;
+}
