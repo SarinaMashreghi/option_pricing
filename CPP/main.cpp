@@ -23,23 +23,23 @@ int main() {
   double strike = 100;
   double time_to_maturity = 1;
   double interest_rate = 0.06;
-  int time_steps = 10;
+  int time_steps = 1000;
   double up_factor = 1.03045;
   char option_type = 'C';
   double barrier = 125;
   double vol = 0.3;
 
-  binomial_asset_pricing pricing_model = binomial_asset_pricing(
-      initial_price, strike, interest_rate, up_factor, option_type);
+  binomial_asset_pricing pricing_model = binomial_asset_pricing();
 
-  vector<double> opt_price =
-      pricing_model.european_option_binomial(time_to_maturity, time_steps);
+  vector<double> opt_price = pricing_model.european_option_binomial(
+      initial_price, strike, interest_rate, vol, option_type, "CRR",
+      time_to_maturity, time_steps);
 
-  cout << "bin model " << opt_price[0] << endl;
+  // cout << "bin model " << opt_price[0] << endl;
 
   // sim.gbm_vs_binomial_sim(10000, initial_price, 0, vol, time_to_maturity,
   // 1000);
-  sim.option_expected_value(10000, initial_price, strike, interest_rate, vol,
+  sim.option_expected_value(100000, initial_price, strike, interest_rate, vol,
                             option_type, time_to_maturity, time_steps);
 
   /*

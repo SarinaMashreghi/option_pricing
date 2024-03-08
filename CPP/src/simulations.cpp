@@ -13,16 +13,16 @@ vector<vector<double>> simulation::binomial_model_sim(int num_simulations,
   double dt = double(time) / time_steps;
   double u = exp(sigma * dt);
 
-  // double disc = exp(dt * r);
-  double disc = pow((1 + interest_rate), 1.0 / time_steps);
+  double disc = exp(dt * interest_rate);
+  // double disc = pow((1 + interest_rate), 1.0 / time_steps);
   double d = 1 / u;
-  cout << "up " << u << " down " << d << endl;
+  // cout << "up " << u << " down " << d << endl;
 
   // risk-neutral probabilities
   double p = (disc - d) / (u - d);
   double q = 1 - p;
 
-  cout << "risk neutral probabilities: " << p << " " << q << endl;
+  // cout << "risk neutral probabilities: " << p << " " << q << endl;
   random_device rd{};
   mt19937 gen{rd()};
   bernoulli_distribution b_dist(p);
@@ -31,7 +31,7 @@ vector<vector<double>> simulation::binomial_model_sim(int num_simulations,
     for (int j = 1; j < time_steps; j++) {
       bin_model[i][j] =
           b_dist(gen) == 1 ? bin_model[i][j - 1] * u : bin_model[i][j - 1] * d;
-      bin_model[i][j] /= disc;
+      // bin_model[i][j] /= disc;
     }
   }
 
@@ -73,7 +73,8 @@ void simulation::option_expected_value(int num_simulations,
       binomial_model_sim(num_simulations, initial_price, interest_rate,
                          volatility, time, time_steps);
 
-  double total;
+  double total = 0;
+  double val;
   for (int i = 0; i < num_simulations; i++) {
     if (opt_type == 'C') // call option
       total += sim[i][time_steps - 1] > strike_price
@@ -85,11 +86,15 @@ void simulation::option_expected_value(int num_simulations,
                    : 0;
     else
       throw invalid_argument("Invalid option type");
+    // total += val;
   }
 
-  double disc = pow((1 + interest_rate), 1.0 / time_steps);
-  double option_expected = total / num_simulations;
-
+  double disc = exp(double(time) / time_steps * interest_rate);
+  double option_expected = total / double(num_simulations);
+  option_expected /= pow(disc, time_steps);
   cout << "simulated value: " << option_expected << endl;
-  // m_bin_model->european_option_binomial(time, time_steps);
+  vector<double> model_vals = m_bin_model->european_option_binomial(
+      initial_price, strike_price, interest_rate, volatility, opt_type, "CRR",
+      time, time_steps);
+  cout << "formula: " << model_vals[0] << endl;
 }

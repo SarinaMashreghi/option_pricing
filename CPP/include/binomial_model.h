@@ -8,13 +8,19 @@ using namespace std;
 class binomial_asset_pricing {
 
 public:
+  /*
   binomial_asset_pricing(double S0, double k, double r, double u, char opttype);
 
   binomial_asset_pricing(double S0, double k, double r, double mu, double sigma,
                          char opttype);
+  */
 
-  vector<double> european_option_binomial(int time, int time_steps);
-  double CRR(double mu, double sigma);
+  vector<double> european_option_binomial(double initial_price, double strike,
+                                          double interest_rate,
+                                          double volatility, char opt_type,
+                                          string method, int time,
+                                          int time_steps);
+  double CRR(double sigma, double dt);
 
   // vector<double> european_option_binomial(double S0, double k, double t, int
   // n,

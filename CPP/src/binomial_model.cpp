@@ -1,5 +1,7 @@
 #include "../include/binomial_model.h"
+#include <stdexcept>
 
+/*
 binomial_asset_pricing::binomial_asset_pricing(double S0, double k, double r,
                                                double u, char opttype) {
 
@@ -20,36 +22,52 @@ binomial_asset_pricing::binomial_asset_pricing(double S0, double k, double r,
   this->m_strike_price = k;
   this->m_interest_rate = r;
 }
+*/
 
-double binomial_asset_pricing::CRR(double mu, double sigma) {}
+double binomial_asset_pricing::CRR(double sigma, double dt) {
+  return exp(sigma * dt);
+}
 
-vector<double>
-binomial_asset_pricing::european_option_binomial(int time, int time_steps) {
+vector<double> binomial_asset_pricing::european_option_binomial(
+    double initial_price, double strike, double interest_rate,
+    double volatility, char opt_type, string method, int time, int time_steps) {
 
-  double dt = time / time_steps;
-  double disc = exp(dt * m_interest_rate);
-  double d = 1 / m_up_factor;
+  double dt = double(time) / time_steps;
+  double disc = exp(dt * interest_rate);
+  // double disc = pow((1 + interest_rate), 1.0 / time_steps);
+
+  double u; // up factor
+  double d; // down factor
+  if (method == "CRR") {
+    u = CRR(volatility, dt);
+    d = 1 / u;
+  } else {
+    throw invalid_argument("Invalid method");
+  }
+
+  // cout << "bin model up factor: " << u << " " << d << endl;
 
   // risk-neutral probabilities
-  double p = (disc - d) / (m_up_factor - d);
+  double p = (disc - d) / (u - d);
   double q = 1 - p;
 
-  vector<double> price(time_steps + 1,
-                       m_initial_price * pow(m_up_factor, time_steps));
+  // cout << "bin model p " << p << " " << q << endl;
+
+  vector<double> price(time_steps + 1, initial_price * pow(u, time_steps));
 
   for (int i = 1; i <= time_steps; i++) {
-    price[i] = price[i - 1] * d / m_up_factor;
+    price[i] = price[i - 1] * d / u;
   }
 
   vector<double> value(time_steps + 1);
 
   for (int i = 0; i <= time_steps; i++) {
-    if (m_opt_type == 'C')
-      value[i] = price[i] - m_strike_price > 0 ? price[i] - m_strike_price
-                                               : 0; // call option
+    if (opt_type == 'C')
+      value[i] = price[i] - strike > 0 ? price[i] - strike : 0; // call option
+    else if (opt_type == 'P')
+      value[i] = strike - price[i] > 0 ? strike - price[i] : 0; // put option
     else
-      value[i] = m_strike_price - price[i] > 0 ? m_strike_price - price[i]
-                                               : 0; // put option
+      throw invalid_argument("Invalid option type");
   }
 
   for (int i = time_steps; i > 0; i--) {
