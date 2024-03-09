@@ -9,20 +9,20 @@ vector<vector<double>> simulation::binomial_model_sim(int num_simulations,
                                                       double sigma, int time,
                                                       int time_steps) {
 
-  vector<vector<double>> bin_model(num_simulations,
-                                   vector<double>(time_steps, initial_price));
-  // up factor
+  /* returns non discounted price simulated by the binomial model */
   double dt = double(time) / time_steps;
   double u = exp(sigma * sqrt(dt));
 
   double disc = exp(dt * interest_rate);
-  // double disc = pow((1 + interest_rate), 1.0 / time_steps);
   double d = 1 / u;
   // cout << "up " << u << " down " << d << endl;
 
   // risk-neutral probabilities
   double p = (disc - d) / (u - d);
   double q = 1 - p;
+
+  vector<vector<double>> bin_model(
+      num_simulations, vector<double>(time_steps, initial_price / disc));
 
   // cout << "risk neutral probabilities: " << p << " " << q << endl;
   random_device rd{};
@@ -33,11 +33,40 @@ vector<vector<double>> simulation::binomial_model_sim(int num_simulations,
     for (int j = 1; j < time_steps; j++) {
       bin_model[i][j] =
           b_dist(gen) == 1 ? bin_model[i][j - 1] * u : bin_model[i][j - 1] * d;
-      // bin_model[i][j] /= disc;
     }
   }
 
   return bin_model;
+}
+
+void simulation::gbm_analysis(int num_simulations, int initial_val,
+                              double drift, double vol, int n_steps, int time) {
+
+  vector<vector<double>> gbm = m_stochastic_gen.GBM(
+      num_simulations, initial_val, drift, vol, n_steps, time);
+
+  vector<double> log_diff(n_steps - 1);
+  for (int i = 0; i < n_steps - 1; i++) {
+    log_diff[i] = log(gbm[0][i + 1] / gbm[0][i]);
+    // cout << log_diff[i] << endl;
+  }
+  cout << "log diff " << sqrt(m_visualizer.variance(log_diff)) << endl;
+
+  double M = m_visualizer.mean(gbm[0]);
+  double V = m_visualizer.variance(gbm[0]);
+  double theory_mean =
+      initial_val * exp(drift * time); // multiplication by initial value???
+  double theory_var =
+      initial_val * initial_val * (exp(2 * drift * time + vol * vol * time));
+
+  double sigma = sqrt(log(theory_var / (theory_mean * theory_mean)) + 1);
+
+  cout << "actual vol: " << vol << endl
+       << "simulated vol: " << sigma << endl
+       << "Mean formula: " << theory_mean << endl
+       << "simulated mean: " << M << endl
+       << "Variance formula: " << theory_var << endl
+       << "simulated var: " << V << endl;
 }
 
 void simulation::gbm_vs_binomial_sim(int num_simulations, double initial_price,
@@ -75,8 +104,15 @@ void simulation::option_expected_value(int num_simulations,
       binomial_model_sim(num_simulations, initial_price, interest_rate,
                          volatility, time, time_steps);
 
+  double disc = exp(double(time) / time_steps * interest_rate);
+  /* add this to another function
+vector<double> expected_price = m_visualizer.expected_value(sim);
+cout << "expected price: " << expected_price[time_steps - 1] << endl;
+cout << "expected price discounted: "
+     << expected_price[time_steps - 1] / pow(disc, time_steps) << endl;
+  */
   double total = 0;
-  double val;
+  vector<double> option_expected(num_simulations);
   for (int i = 0; i < num_simulations; i++) {
     if (opt_type == 'C') // call option
       total += sim[i][time_steps - 1] > strike_price
@@ -88,13 +124,15 @@ void simulation::option_expected_value(int num_simulations,
                    : 0;
     else
       throw invalid_argument("Invalid option type");
-    // total += val;
+
+    option_expected[i] = total / (i + 1);
+    option_expected[i] /= pow(disc, time_steps);
   }
 
-  double disc = exp(double(time) / time_steps * interest_rate);
-  double option_expected = total / double(num_simulations);
-  option_expected /= pow(disc, time_steps);
-  cout << "simulated value: " << option_expected << endl;
+  // double option_expected = total / double(num_simulations);
+  // option_expected /= pow(disc, time_steps);
+
+  cout << "simulated value: " << option_expected[num_simulations - 1] << endl;
   vector<double> jr = m_bin_model.european_option_binomial(
       initial_price, strike_price, interest_rate, volatility, opt_type, "JR",
       time, time_steps);
@@ -109,4 +147,5 @@ void simulation::option_expected_value(int num_simulations,
       initial_price, strike_price, time, interest_rate, 0, volatility, 'C');
 
   cout << "black scholes " << bsm << endl;
+  m_visualizer.make_plot(option_expected, "expected_val.png");
 }

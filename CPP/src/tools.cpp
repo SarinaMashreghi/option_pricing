@@ -1,24 +1,29 @@
 #include "../include/tools.h"
+#include <numeric>
 
-void tools::make_plot(vector<vector<double>> &results, string &file_name) {
-  /*
-  vector<double> x(100);
-  for (int i = 0; i < 100; i++)
-    x[i] = 0.01 * (i + 1);
-  */
-  // plt::plot(x, results);
+// statistical analysis tools
+double tools::mean(vector<double> &values) {
+  return accumulate(values.begin(), values.end(), 0) / values.size();
+}
+
+double tools::variance(vector<double> &values) {
+  double m = mean(values);
+  double var = 0;
+
+  for (auto val : values)
+    var += pow(val - m, 2);
+  return var / (size(values) - 1);
+}
+
+void tools::make_plot(vector<vector<double>> &results, string file_name) {
 
   for (auto rw : results)
     plt::plot(rw);
 
-  double s = 120.0;
-  char t = 'C';
-  // double opt_expected = european_option_expected(results, s, t);
-  // cout << "expected: " << opt_expected << endl;
   plt::save(file_name);
 }
 
-void tools::plot_ma(vector<double> &values, int period, string &file_name) {
+void tools::plot_ma(vector<double> &values, int period, string file_name) {
   double total = 0;
   vector<double> ma;
   vector<double> x;
@@ -38,7 +43,7 @@ void tools::plot_ma(vector<double> &values, int period, string &file_name) {
   plt::save(file_name);
 }
 
-void tools::make_plot(vector<double> &results, string &file_name) {
+void tools::make_plot(vector<double> &results, string file_name) {
 
   plt::plot(results);
 

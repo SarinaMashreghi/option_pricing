@@ -9,6 +9,9 @@
 class simulation {
 public:
   simulation();
+  void gbm_analysis(int num_simulations, int initial_val, double drift,
+                    double vol, int n_steps, int time);
+
   vector<vector<double>> binomial_model_sim(int num_simulations,
                                             double initial_price,
                                             double interest_rate, double sigma,

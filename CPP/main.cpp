@@ -39,8 +39,9 @@ int main() {
 
   // sim.gbm_vs_binomial_sim(10000, initial_price, 0, vol, time_to_maturity,
   // 1000);
-  sim.option_expected_value(1000, initial_price, strike, interest_rate, vol,
-                            option_type, time_to_maturity, time_steps);
+  // sim.option_expected_value(1000, initial_price, strike, interest_rate, vol,
+  //                          option_type, time_to_maturity, time_steps);
+  sim.gbm_analysis(10, 100, 0.3, 0.1, 1000, 1);
 
   /*
 
