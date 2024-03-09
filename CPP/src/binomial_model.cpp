@@ -24,8 +24,91 @@ binomial_asset_pricing::binomial_asset_pricing(double S0, double k, double r,
 }
 */
 
-double binomial_asset_pricing::CRR(double sigma, double dt) {
-  return exp(sigma * dt);
+// check N and Booles rule
+// (https://sites.google.com/view/vinegarhill-financelabs/black-scholes-merton)
+
+// N(0,1) density
+
+double f(double x) {
+
+  double pi = 4.0 * atan(1.0);
+
+  return exp(-x * x * 0.5) / sqrt(2 * pi);
+}
+
+// Boole's Rule
+
+double Boole(double StartPoint, double EndPoint, int n) {
+
+  vector<double> X(n + 1, 0.0);
+
+  vector<double> Y(n + 1, 0.0);
+
+  double delta_x = (EndPoint - StartPoint) / double(n);
+
+  for (int i = 0; i <= n; i++)
+
+  {
+
+    X[i] = StartPoint + i * delta_x;
+
+    Y[i] = f(X[i]);
+  }
+
+  double sum = 0;
+
+  for (int t = 0; t <= (n - 1) / 4; t++)
+
+  {
+
+    int ind = 4 * t;
+
+    sum +=
+
+        (1 / 45.0) *
+        (14 * Y[ind] + 64 * Y[ind + 1] + 24 * Y[ind + 2] +
+
+         64 * Y[ind + 3] + 14 * Y[ind + 4]) *
+        delta_x;
+  }
+
+  return sum;
+}
+
+// N(0,1) cdf by Boole's Rule
+
+double N(double x) { return Boole(-10.0, x, 240); }
+
+double binomial_asset_pricing::black_scholes_merton(double S, double K,
+                                                    double T, double r,
+                                                    double q, double v,
+                                                    char opt_type) {
+
+  double d = (log(S / K) + T * (r - q + 0.5 * v * v)) / (v * sqrt(T));
+  double call = S * exp(-q * T) * N(d) - exp(-r * T) * K * N(d - v * sqrt(T));
+
+  if (opt_type == 'C')
+    return call;
+
+  return call - S * exp(-q * T) + K * exp(-r * T);
+}
+
+void binomial_asset_pricing::CRR(double sigma, double dt, double disc) {
+  // Cox, Ross and Rubinstein method
+  m_up_factor = exp(sigma * dt);
+  m_down_factor = 1 / m_up_factor;
+  m_p_risk_neutral = (disc - m_down_factor) / (m_up_factor - m_down_factor);
+  m_q_risk_neutral = 1 - m_p_risk_neutral;
+}
+
+void binomial_asset_pricing::JR(double sigma, double dt, double interest) {
+  // Jarrow and Rudd method
+  m_q_risk_neutral = 0.5;
+  m_p_risk_neutral = 0.5;
+
+  double nu = interest - sigma * sigma / 2;
+  m_up_factor = exp(nu * dt + sigma * sqrt(dt));
+  m_down_factor = exp(nu * dt - sigma * sqrt(dt));
 }
 
 vector<double> binomial_asset_pricing::european_option_binomial(
@@ -36,27 +119,22 @@ vector<double> binomial_asset_pricing::european_option_binomial(
   double disc = exp(dt * interest_rate);
   // double disc = pow((1 + interest_rate), 1.0 / time_steps);
 
-  double u; // up factor
-  double d; // down factor
+  // double u; // up factor
+  // double d; // down factor
   if (method == "CRR") {
-    u = CRR(volatility, dt);
-    d = 1 / u;
+    CRR(volatility, dt, disc);
+  } else if (method == "JR") {
+    JR(volatility, dt, interest_rate);
   } else {
     throw invalid_argument("Invalid method");
   }
 
-  // cout << "bin model up factor: " << u << " " << d << endl;
-
-  // risk-neutral probabilities
-  double p = (disc - d) / (u - d);
-  double q = 1 - p;
-
-  // cout << "bin model p " << p << " " << q << endl;
-
-  vector<double> price(time_steps + 1, initial_price * pow(u, time_steps));
+  // cout << "up factor " << m_up_factor << " d " << m_down_factor << endl;
+  vector<double> price(time_steps + 1,
+                       initial_price * pow(m_up_factor, time_steps));
 
   for (int i = 1; i <= time_steps; i++) {
-    price[i] = price[i - 1] * d / u;
+    price[i] = price[i - 1] * m_down_factor / m_up_factor;
   }
 
   vector<double> value(time_steps + 1);
@@ -72,7 +150,9 @@ vector<double> binomial_asset_pricing::european_option_binomial(
 
   for (int i = time_steps; i > 0; i--) {
     for (int j = 0; j < i; j++) {
-      value[j] = (p * value[j] + q * value[j + 1]) / disc;
+      value[j] =
+          (m_p_risk_neutral * value[j] + m_q_risk_neutral * value[j + 1]) /
+          disc;
     }
   }
 
@@ -122,17 +202,3 @@ double binomial_asset_pricing::barrier_option_binomial(double S0, double k,
 
   return value[0];
 }
-
-// setting parameters
-/*
-vector<double> binomial_asset_pricing::CRR(double initial_price, double strike,
-                                           double interest, double volatility,
-                                           double time, int n_steps,
-                                           char opttype) {
-  double dt = time / n_steps;
-  double u = exp(volatility * dt);
-
-  return european_option_binomial(initial_price, strike, time, n_steps,
-                                  interest, u, opttype);
-}
-*/

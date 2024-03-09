@@ -20,7 +20,13 @@ public:
                                           double volatility, char opt_type,
                                           string method, int time,
                                           int time_steps);
-  double CRR(double sigma, double dt);
+
+  // setting parameters
+  void CRR(double sigma, double dt, double disc);
+  void JR(double sigma, double dt, double interest);
+
+  double black_scholes_merton(double S, double K, double T, double r, double q,
+                              double v, char opt_type);
 
   // vector<double> european_option_binomial(double S0, double k, double t, int
   // n,

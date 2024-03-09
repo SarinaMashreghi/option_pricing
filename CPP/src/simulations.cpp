@@ -1,6 +1,8 @@
 #include "../include/simulations.h"
 #include <stdexcept>
 
+simulation::simulation() { m_bin_model = binomial_asset_pricing(); }
+
 vector<vector<double>> simulation::binomial_model_sim(int num_simulations,
                                                       double initial_price,
                                                       double interest_rate,
@@ -93,8 +95,13 @@ void simulation::option_expected_value(int num_simulations,
   double option_expected = total / double(num_simulations);
   option_expected /= pow(disc, time_steps);
   cout << "simulated value: " << option_expected << endl;
-  vector<double> model_vals = m_bin_model->european_option_binomial(
-      initial_price, strike_price, interest_rate, volatility, opt_type, "CRR",
+  vector<double> model_vals = m_bin_model.european_option_binomial(
+      initial_price, strike_price, interest_rate, volatility, opt_type, "JR",
       time, time_steps);
   cout << "formula: " << model_vals[0] << endl;
+
+  double bsm = m_bin_model.black_scholes_merton(
+      initial_price, strike_price, time, interest_rate, 0, volatility, 'C');
+
+  cout << "black scholes " << bsm << endl;
 }

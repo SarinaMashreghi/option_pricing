@@ -8,7 +8,7 @@
 
 class simulation {
 public:
-  // simulation();
+  simulation();
   vector<vector<double>> binomial_model_sim(int num_simulations,
                                             double initial_price,
                                             double interest_rate, double sigma,
@@ -25,7 +25,7 @@ public:
 
 private:
   stochastic m_stochastic_gen;
-  binomial_asset_pricing *m_bin_model;
+  binomial_asset_pricing m_bin_model;
   tools m_visualizer;
 };
 
