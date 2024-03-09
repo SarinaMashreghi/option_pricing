@@ -95,7 +95,7 @@ double binomial_asset_pricing::black_scholes_merton(double S, double K,
 
 void binomial_asset_pricing::CRR(double sigma, double dt, double disc) {
   // Cox, Ross and Rubinstein method
-  m_up_factor = exp(sigma * dt);
+  m_up_factor = exp(sigma * sqrt(dt));
   m_down_factor = 1 / m_up_factor;
   m_p_risk_neutral = (disc - m_down_factor) / (m_up_factor - m_down_factor);
   m_q_risk_neutral = 1 - m_p_risk_neutral;

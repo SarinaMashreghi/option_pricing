@@ -13,7 +13,7 @@ vector<vector<double>> simulation::binomial_model_sim(int num_simulations,
                                    vector<double>(time_steps, initial_price));
   // up factor
   double dt = double(time) / time_steps;
-  double u = exp(sigma * dt);
+  double u = exp(sigma * sqrt(dt));
 
   double disc = exp(dt * interest_rate);
   // double disc = pow((1 + interest_rate), 1.0 / time_steps);
@@ -95,10 +95,15 @@ void simulation::option_expected_value(int num_simulations,
   double option_expected = total / double(num_simulations);
   option_expected /= pow(disc, time_steps);
   cout << "simulated value: " << option_expected << endl;
-  vector<double> model_vals = m_bin_model.european_option_binomial(
+  vector<double> jr = m_bin_model.european_option_binomial(
       initial_price, strike_price, interest_rate, volatility, opt_type, "JR",
       time, time_steps);
-  cout << "formula: " << model_vals[0] << endl;
+  vector<double> crr = m_bin_model.european_option_binomial(
+      initial_price, strike_price, interest_rate, volatility, opt_type, "CRR",
+      time, time_steps);
+
+  cout << "Jarrow and Rudd: " << jr[0] << endl;
+  cout << "CRR " << crr[0] << endl;
 
   double bsm = m_bin_model.black_scholes_merton(
       initial_price, strike_price, time, interest_rate, 0, volatility, 'C');
