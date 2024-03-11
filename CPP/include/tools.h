@@ -14,6 +14,8 @@ public:
   double variance(vector<double> &values);
 
   void make_plot(vector<vector<double>> &results, string file_name);
+  void make_plot(vector<double> &x, vector<vector<double>> &results,
+                 vector<string> &labels, string title, string file_name);
   void make_plot(vector<double> &results, string file_name);
   void plot_ma(vector<double> &values, int period, string file_name);
   void plot_mean_var(vector<double> &values);

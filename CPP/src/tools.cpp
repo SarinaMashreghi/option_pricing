@@ -1,5 +1,6 @@
 #include "../include/tools.h"
 #include <numeric>
+#include <stdexcept>
 
 // statistical analysis tools
 double tools::mean(vector<double> &values) {
@@ -13,6 +14,20 @@ double tools::variance(vector<double> &values) {
   for (auto val : values)
     var += pow(val - m, 2);
   return var / (size(values) - 1);
+}
+
+void tools::make_plot(vector<double> &x, vector<vector<double>> &results,
+                      vector<string> &labels, string title, string file_name) {
+
+  if (labels.size() != results.size())
+    throw invalid_argument("Labels must match the size of results");
+
+  for (int i = 0; i < results.size(); i++)
+    plt::plot(x, results[i], {{"label", labels[i]}});
+
+  plt::legend();
+  plt::title(title);
+  plt::save(file_name);
 }
 
 void tools::make_plot(vector<vector<double>> &results, string file_name) {

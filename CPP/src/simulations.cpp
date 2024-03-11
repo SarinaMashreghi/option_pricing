@@ -112,7 +112,10 @@ cout << "expected price discounted: "
      << expected_price[time_steps - 1] / pow(disc, time_steps) << endl;
   */
   double total = 0;
-  vector<double> option_expected(num_simulations);
+  int interval_size = 5;
+  int partition = num_simulations / interval_size;
+  vector<double> option_expected(partition);
+  vector<double> x(partition);
   for (int i = 0; i < num_simulations; i++) {
     if (opt_type == 'C') // call option
       total += sim[i][time_steps - 1] > strike_price
@@ -125,8 +128,12 @@ cout << "expected price discounted: "
     else
       throw invalid_argument("Invalid option type");
 
-    option_expected[i] = total / (i + 1);
-    option_expected[i] /= pow(disc, time_steps);
+    if ((i + 1) % interval_size == 0) {
+      int index = (i + 1) / interval_size - 1;
+      x[index] = i + 1;
+      option_expected[index] = total / i;
+      option_expected[index] /= pow(disc, time_steps);
+    }
   }
 
   // double option_expected = total / double(num_simulations);
@@ -136,18 +143,24 @@ cout << "expected price discounted: "
   vector<double> jr = m_bin_model.european_option_binomial(
       initial_price, strike_price, interest_rate, volatility, opt_type, "JR",
       time, time_steps);
-  vector<double> crr = m_bin_model.european_option_binomial(
+  vector<double> crr_final = m_bin_model.european_option_binomial(
       initial_price, strike_price, interest_rate, volatility, opt_type, "CRR",
       time, time_steps);
 
   cout << "Jarrow and Rudd: " << jr[0] << endl;
-  cout << "CRR " << crr[0] << endl;
+  cout << "CRR " << crr_final[0] << endl;
+
+  vector<double> crr(partition, crr_final[0]);
 
   double bsm = m_bin_model.black_scholes_merton(
       initial_price, strike_price, time, interest_rate, 0, volatility, 'C');
 
   cout << "black scholes " << bsm << endl;
-  m_visualizer.make_plot(option_expected, "expected_val.png");
+  vector<vector<double>> final = {option_expected, crr};
+  vector<string> l = {"Expected Value", "CRR"};
+  m_visualizer.make_plot(x, final, l, "Expected Value vs CRR",
+                         "expected_val.png");
+  cout << "here" << endl;
 }
 
 void simulation::compare_methods(double initial_price, double strike,
@@ -155,7 +168,7 @@ void simulation::compare_methods(double initial_price, double strike,
                                  int time, int max_steps) {
 
   int n = max_steps / 100;
-  vector<int> x(n);
+  vector<double> x(n);
 
   for (int i = 0; i < n; i++)
     x[i] = (i + 1) * 100;
@@ -180,5 +193,9 @@ void simulation::compare_methods(double initial_price, double strike,
   total[1] = crr;
   total[2] = bsm;
 
-  m_visualizer.make_plot(total, "compare_methods.png");
+  vector<string> labels = {"Jarrow and Rudd", "Cox, Ross and Rubinstein",
+                           "Black-Scholes-Merton"};
+
+  m_visualizer.make_plot(x, total, labels, "Methods Comparison",
+                         "compare_methods.png");
 }
