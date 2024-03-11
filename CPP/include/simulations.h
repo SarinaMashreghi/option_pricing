@@ -26,6 +26,9 @@ public:
                              double volatility, char opt_type, int time,
                              int time_steps);
 
+  void compare_methods(double initial_price, double strike, double interest,
+                       double vol, double opt_type, int time, int max_steps);
+
 private:
   stochastic m_stochastic_gen;
   binomial_asset_pricing m_bin_model;

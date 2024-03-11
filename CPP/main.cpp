@@ -41,7 +41,8 @@ int main() {
   // 1000);
   // sim.option_expected_value(1000, initial_price, strike, interest_rate, vol,
   //                          option_type, time_to_maturity, time_steps);
-  sim.gbm_analysis(10, 100, 0.3, 0.1, 1000, 1);
+  // sim.gbm_analysis(10, 100, 0.3, 0.1, 1000, 1);
+  sim.compare_methods(initial_price, strike, interest_rate, vol, 'C', 1, 10000);
 
   /*
 

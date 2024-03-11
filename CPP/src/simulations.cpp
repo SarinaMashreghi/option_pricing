@@ -149,3 +149,36 @@ cout << "expected price discounted: "
   cout << "black scholes " << bsm << endl;
   m_visualizer.make_plot(option_expected, "expected_val.png");
 }
+
+void simulation::compare_methods(double initial_price, double strike,
+                                 double interest, double vol, double opt_type,
+                                 int time, int max_steps) {
+
+  int n = max_steps / 100;
+  vector<int> x(n);
+
+  for (int i = 0; i < n; i++)
+    x[i] = (i + 1) * 100;
+
+  vector<vector<double>> total(3);
+  vector<double> jr(n);
+  vector<double> crr(n);
+  vector<double> bsm(n, m_bin_model.black_scholes_merton(initial_price, strike,
+                                                         time, interest, 0, vol,
+                                                         opt_type));
+
+  for (int i = 0; i < n; i++) {
+    vector<double> jr_tmp = m_bin_model.european_option_binomial(
+        initial_price, strike, interest, vol, opt_type, "JR", time, x[i]);
+    vector<double> crr_tmp = m_bin_model.european_option_binomial(
+        initial_price, strike, interest, vol, opt_type, "CRR", time, x[i]);
+    jr[i] = jr_tmp[0];
+    crr[i] = crr_tmp[0];
+  }
+
+  total[0] = jr;
+  total[1] = crr;
+  total[2] = bsm;
+
+  m_visualizer.make_plot(total, "compare_methods.png");
+}
