@@ -24,10 +24,13 @@ public:
   void option_expected_value(int num_simulation, double initial_price,
                              double strike_price, double interest_rate,
                              double volatility, char opt_type, int time,
-                             int time_steps);
+                             int time_steps, string data_method);
 
   void compare_methods(double initial_price, double strike, double interest,
                        double vol, double opt_type, int time, int max_steps);
+
+  void martingale(int num_simulations, double initial_price,
+                  double interest_rate, double sigma, int time, int time_steps);
 
 private:
   stochastic m_stochastic_gen;

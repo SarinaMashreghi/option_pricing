@@ -4,7 +4,7 @@
 
 // statistical analysis tools
 double tools::mean(vector<double> &values) {
-  return accumulate(values.begin(), values.end(), 0) / values.size();
+  return double(accumulate(values.begin(), values.end(), 0)) / values.size();
 }
 
 double tools::variance(vector<double> &values) {
@@ -16,14 +16,12 @@ double tools::variance(vector<double> &values) {
   return var / (size(values) - 1);
 }
 
-void tools::make_plot(vector<double> &x, vector<vector<double>> &results,
-                      vector<string> &labels, string title, string file_name) {
+void tools::make_plot(vector<double> &x,
+                      unordered_map<string, vector<double>> &results,
+                      string title, string file_name) {
 
-  if (labels.size() != results.size())
-    throw invalid_argument("Labels must match the size of results");
-
-  for (int i = 0; i < results.size(); i++)
-    plt::plot(x, results[i], {{"label", labels[i]}});
+  for (auto item : results)
+    plt::plot(x, item.second, {{"label", item.first}});
 
   plt::legend();
   plt::title(title);
@@ -88,6 +86,7 @@ void tools::plot_mean_var(vector<double> &values) {
 }
 
 vector<double> tools::expected_value(vector<vector<double>> &simulations) {
+  /* expected value at each step of the simulation */
   int n_sims = simulations.size();
   int steps = simulations[0].size();
 
@@ -101,4 +100,41 @@ vector<double> tools::expected_value(vector<vector<double>> &simulations) {
   }
 
   return expected_vals;
+}
+
+vector<double> expected_value_2(vector<vector<double>> &simulations) {
+  /* E[X2] */
+  int n_sims = simulations.size();
+  int steps = simulations[0].size();
+
+  vector<double> expected_vals(steps, 0);
+
+  for (int i = 0; i < steps; i++) {
+    for (int j = 0; j < n_sims; j++) {
+      expected_vals[i] += simulations[j][i] * simulations[j][i];
+    }
+    expected_vals[i] /= n_sims;
+  }
+
+  return expected_vals;
+}
+
+vector<double> tools::var_expected_val(vector<vector<double>> &sim,
+                                       vector<double> &expected_val) {
+  vector<double> ex2 = expected_value_2(sim);
+  vector<double> var(expected_val.size());
+  for (int i = 0; i < expected_val.size(); i++) {
+    var[i] = ex2[i] - expected_val[i] * expected_val[i];
+  }
+  /*
+  vector<double> var(expected_val.size(), 0);
+
+  for (int i = 0; i < expected_val.size(); i++) {
+    for (int j = 0; j < sim.size(); j++) {
+      var[i] += pow(sim[j][i] - expected_val[i], 2);
+    }
+    var[i] /= sim.size() - 1;
+  }
+  */
+  return var;
 }
