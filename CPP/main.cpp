@@ -7,17 +7,12 @@
 #include <iostream>
 #include <sstream>
 
-int main() {
+int main(int argc, char **argv) { // arguments: simulation name
 
   stochastic s = stochastic();
   tools visualizer = tools();
   simulation sim = simulation();
-  // vector<vector<double>> rw = s.random_walk_symmetric(100, 100);
-  vector<vector<double>> gbm = s.GBM(10, 100, 0.1, 0.3, 1000, 1);
-  string file_name = "test.png";
-  // visualizer.make_plot(gbm, file_name);
-  //  s.plot_ma(gbm[0], 5, file_name);
-  //  s.make_plot(gbm, file_name);
+  binomial_asset_pricing pricing_model = binomial_asset_pricing();
 
   double initial_price = 100;
   double strike = 110;
@@ -29,50 +24,28 @@ int main() {
   double barrier = 125;
   double vol = 0.3;
 
-  binomial_asset_pricing pricing_model = binomial_asset_pricing();
+  if (strcmp(argv[1], "BIN") == 0) {
 
-  // vector<double> opt_price = pricing_model.european_option_binomial(
-  //     initial_price, strike, interest_rate, vol, option_type, "CRR",
-  //     time_to_maturity, time_steps);
+    vector<double> opt_price = pricing_model.european_option_binomial(
+        initial_price, strike, interest_rate, vol, option_type, "CRR",
+        time_to_maturity, time_steps);
 
-  // cout << "bin model " << opt_price[0] << endl;
-
-  // sim.gbm_vs_binomial_sim(10000, initial_price, 0, vol, time_to_maturity,
-  // 1000);
-  // sim.option_expected_value(1000, initial_price, strike, interest_rate, vol,
-  //                          option_type, time_to_maturity, time_steps, "GBM");
-  sim.gbm_analysis(1000, 100, 0.3, 0.1, 100, 1);
-  // sim.compare_methods(initial_price, strike, interest_rate, vol, 'C', 1,
-  // 10000);
-  // sim.martingale(1000, initial_price, interest_rate, vol,
-  // time_to_maturity,time_steps);
-
-  /*
-
-
-  vector<double> test;
-
-  for (int i = 0; i < 1000; i++) {
-
-
-vector<double> european_opt =
-pricing_model.european_option_binomial( initial_price, strike,
-time_to_maturity, i, interest_rate, up_factor, option_type);
-
-    vector<double> crr =
-        pricing_model.CRR(initial_price, strike, interest_rate,
-vol, time_to_maturity, i, option_type); cout << i << " " <<
-crr[0] << endl; test.push_back(crr[0]);
+    cout << "bin model " << opt_price[0] << endl;
+  } else if (strcmp(argv[1], "GBM") == 0) {
+    sim.gbm_vs_binomial_sim(10000, initial_price, 0, vol, time_to_maturity,
+                            time_steps);
+  } else if (strcmp(argv[1], "EXPECTED") == 0) {
+    sim.option_expected_value(1000, initial_price, strike, interest_rate, vol,
+                              option_type, time_to_maturity, time_steps, "GBM");
+  } else if (strcmp(argv[1], "ANALYSIS") == 0) {
+    sim.gbm_analysis(1000, 100, 0.3, 0.1, 100, 1);
+  } else if (strcmp(argv[1], "COMPARE") == 0) {
+    sim.compare_methods(initial_price, strike, interest_rate, vol, 'C', 1,
+                        10000);
+  } else if (strcmp(argv[1], "MARTINGALE") == 0) {
+    sim.martingale(1000, initial_price, interest_rate, vol, time_to_maturity,
+                   time_steps);
   }
-  string file = "european_test.png";
-
-  double barrier_opt = pricing_model.barrier_option_binomial(
-      initial_price, strike, barrier, time_to_maturity,
-time_steps, interest_rate, up_factor, option_type);
-  s.make_plot(test, file);
-  cout << barrier_opt << endl;
-
-  */
 
   return 0;
 }
