@@ -45,24 +45,20 @@ void simulation::gbm_analysis(int num_simulations, int initial_val,
   vector<vector<double>> gbm = m_stochastic_gen.GBM(
       num_simulations, initial_val, drift, vol, n_steps, time);
 
-  double M = m_visualizer.mean(gbm[0]);
   vector<double> ev = m_visualizer.expected_value(gbm);
-  double V = m_visualizer.variance(gbm[0]);
-  double theory_mean =
-      initial_val * exp(drift * time); // multiplication by initial value???
-  double theory_var =
-      initial_val * initial_val * (exp(2 * drift * time + vol * vol * time));
+  double theory_mean = initial_val * exp(drift * time);
+  double theory_var = initial_val * initial_val *
+                      (exp(2 * drift * time + vol * vol * time)) *
+                      (exp(vol * vol * time) - 1);
   vector<double> ev_val = m_visualizer.var_expected_val(gbm, ev);
 
-  double sigma = sqrt(log(theory_var / (theory_mean * theory_mean)) + 1);
+  double sigma = sqrt(log(theory_var / (theory_mean * theory_mean) + 1));
 
   cout << "actual vol: " << vol << endl
        << "Expected val: " << ev[ev.size() - 1] << endl
        << "simulated vol: " << sigma << endl
        << "Mean formula: " << theory_mean << endl
-       << "simulated mean: " << M << endl
        << "Variance formula: " << theory_var << endl
-       << "simulated var: " << V << endl
        << "expected var: " << ev_val[ev.size() - 1] << endl;
 }
 
