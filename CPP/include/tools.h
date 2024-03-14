@@ -12,6 +12,7 @@ class tools {
 public:
   double mean(vector<double> &values);
   double variance(vector<double> &values);
+  double estimated_volatility(vector<double> &values, double dt);
 
   void make_plot(vector<vector<double>> &results, string file_name);
   void make_plot(vector<double> &x,

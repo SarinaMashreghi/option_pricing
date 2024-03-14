@@ -4,7 +4,8 @@
 
 // statistical analysis tools
 double tools::mean(vector<double> &values) {
-  return double(accumulate(values.begin(), values.end(), 0)) / values.size();
+  return double(accumulate(values.begin(), values.end(), 0.0)) /
+         (values.size() - 1);
 }
 
 double tools::variance(vector<double> &values) {
@@ -13,7 +14,20 @@ double tools::variance(vector<double> &values) {
 
   for (auto val : values)
     var += pow(val - m, 2);
-  return var / (size(values) - 1);
+  return var / (values.size() - 1);
+}
+
+double tools::estimated_volatility(vector<double> &values, double dt) {
+  vector<double> log_return(values.size() - 1);
+  for (int i = 0; i < log_return.size(); i++)
+    log_return[i] = log(values[i + 1] / values[i]);
+  double mean_return = mean(log_return);
+  double sample_var = variance(log_return);
+  double estimated_vol = sqrt(sample_var / dt);
+  cout << "mean r " << mean_return << endl
+       << "dt " << dt << endl
+       << "sample var " << sample_var << endl;
+  return estimated_vol;
 }
 
 void tools::make_plot(vector<double> &x,
@@ -103,7 +117,7 @@ vector<double> tools::expected_value(vector<vector<double>> &simulations) {
 }
 
 vector<double> expected_value_2(vector<vector<double>> &simulations) {
-  /* E[X2] */
+  /* E[X^2] */
   int n_sims = simulations.size();
   int steps = simulations[0].size();
 
@@ -113,7 +127,7 @@ vector<double> expected_value_2(vector<vector<double>> &simulations) {
     for (int j = 0; j < n_sims; j++) {
       expected_vals[i] += simulations[j][i] * simulations[j][i];
     }
-    expected_vals[i] /= n_sims;
+    expected_vals[i] /= n_sims - 1;
   }
 
   return expected_vals;

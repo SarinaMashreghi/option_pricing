@@ -38,7 +38,7 @@ int main(int argc, char **argv) { // arguments: simulation name
     sim.option_expected_value(1000, initial_price, strike, interest_rate, vol,
                               option_type, time_to_maturity, time_steps, "GBM");
   } else if (strcmp(argv[1], "ANALYSIS") == 0) {
-    sim.gbm_analysis(10000, 100, 0.3, 0.1, 100, 1);
+    sim.gbm_analysis(1000, 100, 0.4, 0.3, 1000, 1);
   } else if (strcmp(argv[1], "COMPARE") == 0) {
     sim.compare_methods(initial_price, strike, interest_rate, vol, 'C', 1,
                         10000);

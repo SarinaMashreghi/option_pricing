@@ -1,4 +1,5 @@
 #include "../include/simulations.h"
+#include <numeric>
 #include <stdexcept>
 
 simulation::simulation() { m_bin_model = binomial_asset_pricing(); }
@@ -46,20 +47,25 @@ void simulation::gbm_analysis(int num_simulations, int initial_val,
       num_simulations, initial_val, drift, vol, n_steps, time);
 
   vector<double> ev = m_visualizer.expected_value(gbm);
+  double sample_mean = ev[ev.size() - 1];
   double theory_mean = initial_val * exp(drift * time);
   double theory_var = initial_val * initial_val *
                       (exp(2 * drift * time + vol * vol * time)) *
                       (exp(vol * vol * time) - 1);
   vector<double> ev_val = m_visualizer.var_expected_val(gbm, ev);
+  double estimate_var = ev_val[ev_val.size() - 1];
 
-  double sigma = sqrt(log(theory_var / (theory_mean * theory_mean) + 1));
+  double sigma = sqrt(log(estimate_var / (sample_mean * sample_mean) + 1));
+  double estimated_vol =
+      m_visualizer.estimated_volatility(gbm[0], double(time) / n_steps);
 
   cout << "actual vol: " << vol << endl
        << "Expected val: " << ev[ev.size() - 1] << endl
        << "simulated vol: " << sigma << endl
        << "Mean formula: " << theory_mean << endl
        << "Variance formula: " << theory_var << endl
-       << "expected var: " << ev_val[ev.size() - 1] << endl;
+       << "expected var: " << ev_val[ev.size() - 1] << endl
+       << "Estimated vol: " << estimated_vol << endl;
 }
 
 void simulation::gbm_vs_binomial_sim(int num_simulations, double initial_price,
