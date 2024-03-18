@@ -1,4 +1,5 @@
 #include "../include/tools.h"
+#include <fstream>
 #include <numeric>
 #include <stdexcept>
 
@@ -24,9 +25,6 @@ double tools::estimated_volatility(vector<double> &values, double dt) {
   double mean_return = mean(log_return);
   double sample_var = variance(log_return);
   double estimated_vol = sqrt(sample_var / dt);
-  cout << "mean r " << mean_return << endl
-       << "dt " << dt << endl
-       << "sample var " << sample_var << endl;
   return estimated_vol;
 }
 
@@ -151,4 +149,10 @@ vector<double> tools::var_expected_val(vector<vector<double>> &sim,
   }
   */
   return var;
+}
+
+void tools::export_csv(unordered_map<string, vector<double>> &values,
+                       string file_name) {
+  ofstream file;
+  file.open(file_name);
 }

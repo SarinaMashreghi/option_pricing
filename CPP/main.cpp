@@ -14,6 +14,8 @@ int main(int argc, char **argv) { // arguments: simulation name
   simulation sim = simulation();
   binomial_asset_pricing pricing_model = binomial_asset_pricing();
 
+  visualizer.video();
+
   double initial_price = 100;
   double strike = 110;
   double time_to_maturity = 3;
