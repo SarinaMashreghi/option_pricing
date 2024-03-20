@@ -16,7 +16,6 @@ vector<vector<double>> stochastic::random_walk_symmetric(int num_simulations,
         res[i][j] = res[i][j - 1] - 1;
     }
   }
-
   return res;
 }
 

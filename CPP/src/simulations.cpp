@@ -214,3 +214,9 @@ void simulation::martingale(int num_simulations, double initial_price,
   vector<double> expected = m_visualizer.expected_value(bin_sim);
   m_visualizer.make_plot(expected, "martingale.png");
 }
+
+void simulation::random_walk_sim(int n_simulations) {
+  vector<vector<double>> rw =
+      m_stochastic_gen.random_walk_symmetric(n_simulations, 100);
+  m_visualizer.make_plot_steps(rw);
+}

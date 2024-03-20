@@ -3,6 +3,7 @@
 #include "include/stochastic.h"
 #include "include/tools.h"
 
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -13,8 +14,6 @@ int main(int argc, char **argv) { // arguments: simulation name
   tools visualizer = tools();
   simulation sim = simulation();
   binomial_asset_pricing pricing_model = binomial_asset_pricing();
-
-  visualizer.video();
 
   double initial_price = 100;
   double strike = 110;
@@ -47,6 +46,8 @@ int main(int argc, char **argv) { // arguments: simulation name
   } else if (strcmp(argv[1], "MARTINGALE") == 0) {
     sim.martingale(1000, initial_price, interest_rate, vol, time_to_maturity,
                    time_steps);
+  } else if (strcmp(argv[1], "RW") == 0) {
+    sim.random_walk_sim(20);
   }
 
   return 0;

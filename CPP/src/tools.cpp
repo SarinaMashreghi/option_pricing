@@ -32,20 +32,54 @@ void tools::make_plot(vector<double> &x,
                       unordered_map<string, vector<double>> &results,
                       string title, string file_name) {
 
+  plt::xlim(0, 100);
   for (auto item : results)
     plt::plot(x, item.second, {{"label", item.first}});
 
   plt::legend();
   plt::title(title);
-  plt::save(file_name);
+  // plt::save(file_name);
 }
 
 void tools::make_plot(vector<vector<double>> &results, string file_name) {
 
-  for (auto rw : results)
-    plt::plot(rw);
+  plt::xlim(0, 100);
+  plt::ylim(-35, 35);
+  for (int i = 0; i < results.size(); i++) {
+    plt::plot(results[i]);
+    plt::save("test/" + to_string(i) + ".png");
+    cout << i << endl;
+  }
+  cout << "here" << endl;
 
-  plt::save(file_name);
+  // plt::save(file_name);
+}
+
+string random_hex_color() {
+  std::string color = "#";
+  char hex_chars[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+                      '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+  for (int i = 0; i < 6; ++i) {
+    color += hex_chars[rand() % 16];
+  }
+
+  return color;
+}
+
+void tools::make_plot_steps(vector<vector<double>> &results) {
+  plt::xlim(0, 100);
+  plt::ylim(-35, 35);
+  int counter = 0;
+  for (int i = 0; i < results.size(); i++) {
+    string color = random_hex_color();
+    for (int j = 1; j < results[i].size(); j++) {
+      plt::plot(vector<double>(results[i].begin(), results[i].begin() + j),
+                {{"color", color}});
+      plt::save("test/" + to_string(counter) + ".png");
+      counter++;
+    }
+  }
 }
 
 void tools::plot_ma(vector<double> &values, int period, string file_name) {
@@ -150,9 +184,10 @@ vector<double> tools::var_expected_val(vector<vector<double>> &sim,
   */
   return var;
 }
-
+/*
 void tools::export_csv(unordered_map<string, vector<double>> &values,
                        string file_name) {
   ofstream file;
   file.open(file_name);
 }
+*/

@@ -32,6 +32,8 @@ public:
   void martingale(int num_simulations, double initial_price,
                   double interest_rate, double sigma, int time, int time_steps);
 
+  void random_walk_sim(int n_simulations);
+
 private:
   stochastic m_stochastic_gen;
   binomial_asset_pricing m_bin_model;

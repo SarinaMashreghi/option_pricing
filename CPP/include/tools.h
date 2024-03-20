@@ -25,7 +25,8 @@ public:
   vector<double> var_expected_val(vector<vector<double>> &sim,
                                   vector<double> &expected_val);
 
-  void export_csv(unordered_map<string, vector<double>> &values);
+  // void export_csv(unordered_map<string, vector<double>> &values);
+  void make_plot_steps(vector<vector<double>> &results);
 };
 
 #endif // TOOLS_HEADER_H
